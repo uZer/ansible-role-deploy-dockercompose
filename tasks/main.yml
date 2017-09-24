@@ -19,7 +19,7 @@
   copy:
     local_follow: yes
     src: ".build/{{ instance | default('default') }}/{{ inventory_hostname }}/{{ item }}"
-    dest: "/root/ansible_generated_docker-compose/"
+    dest: "/root/ansible_generated_docker-compose/{{ instance }}"
     # backup: yes
     mode: '0700'
     owner: root
