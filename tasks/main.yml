@@ -1,7 +1,7 @@
 ---
 - name: Build docker-compose service folder if needed
   file:
-    path: ".build/{{ inventory_hostname }}/{{ item }}"
+    path: ".build/{{ instance | defaults("default") }}/{{ inventory_hostname }}/{{ item }}"
     state: directory
   delegate_to: localhost
   with_items:
@@ -10,7 +10,7 @@
 - name: Build docker-compose service files
   template:
     src: "docker_services/{{ item }}/docker-compose.yml.j2"
-    dest: ".build/{{ inventory_hostname }}/{{ item }}/docker-compose.yml"
+    dest: ".build/{{ instance | default("default") }}/{{ inventory_hostname }}/{{ item }}/docker-compose.yml"
   delegate_to: localhost
   with_items:
     - "{{ docker_services }}"
@@ -18,7 +18,7 @@
 - name: Deploy docker-compose files to host
   copy:
     local_follow: yes
-    src: ".build/{{ inventory_hostname }}/{{ item }}"
+    src: ".build/{{ instance | default("default") }}/{{ inventory_hostname }}/{{ item }}"
     dest: "/root/ansible_generated_docker-compose/"
     # backup: yes
     mode: '0700'
@@ -30,8 +30,8 @@
 
 - name: Deploy services on host
   docker_service:
-    # project_src: ".build/{{ inventory_hostname }}/{{ item }}/docker-compose.yml"
-    project_src: "/root/ansible_generated_docker-compose/{{ item }}"
+    # project_src: ".build/{{ instance | default("default") }}/{{ inventory_hostname }}/{{ item }}/docker-compose.yml"
+    project_src: "/root/ansible_generated_docker-compose/{{ instance | default("default") }}/{{ item }}"
     state: present
     recreate: "{{ docker_service_recreate | default('smart') }}"
   become: yes
