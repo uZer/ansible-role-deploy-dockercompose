@@ -28,8 +28,19 @@
   with_items:
     - "{{ docker_services }}"
 
+- name: Force, if needed, destruction of data directories
+  docker_service:
+    project_src: "/root/ansible_generated_docker-compose/{{ instance | default('default') }}/{{ item }}"
+    state: absent
+    remove_volumes: yes
+  become: yes
+  with_items:
+    - "{{ docker_services }}"
+  when: docker_service_stop_and_purge
+
 - name: Deploy services on host
   docker_service:
+    pull: yes
     # project_src: ".build/{{ instance | default('default') }}/{{ inventory_hostname }}/{{ item }}/docker-compose.yml"
     project_src: "/root/ansible_generated_docker-compose/{{ instance | default('default') }}/{{ item }}"
     state: present
